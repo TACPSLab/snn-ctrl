@@ -1,0 +1,56 @@
+<sdf version='1.7'>
+  <world name='empty_square_enclosure'>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Load model --> 
+    <include>
+      <uri>model://square_enclosure</uri>
+    </include>
+
+    <physics type="ode">
+      <real_time_update_rate>0</real_time_update_rate>
+      <!-- Product of real time update rate and max step size represents the
+      target real time factor, or ratio of simulation time to real-time. -->
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>150</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.400000</sor>
+          <use_dynamic_moi_rescaling>1</use_dynamic_moi_rescaling>
+          <!-- https://classic.gazebosim.org/tutorials?tut=parallel -->
+          <thread_position_correction>False</thread_position_correction>
+          <island_threads>0</island_threads>
+        </solver>
+        <constraints>
+          <cfm>0.00001</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>2000.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <!-- Modified to reduce computation effort if using CPU for rendering, default : True -->
+      <shadows>False</shadows>
+    </scene>
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0.0 0.0 17.0 0 1.5708 0</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

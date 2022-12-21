@@ -1,0 +1,24 @@
+<?xml version='1.0'?>
+<sdf version='1.7'>
+  <model name='goal'>
+    <static>True</static>
+    <link name='goal'>
+      <visual name='goal'>
+        <pose frame=''>0 0 0.002 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.4</radius>
+            <length>0.001</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,3 @@
+[submodule "deeprl"]
+	path = deeprl
+	url = https://github.com/MinghongAlexXu/deeprl.git
