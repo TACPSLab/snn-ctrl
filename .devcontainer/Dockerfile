@@ -23,14 +23,16 @@ RUN echo '[ -f ~/catkin_ws/devel/setup.bash ] && source ~/catkin_ws/devel/setup.
 
 RUN sudo apt-get update && sudo apt-get install --yes --no-install-recommends \
         curl wget git \
-        python-is-python3 python3-pip \
+        python3-pip \
+        # https://launchpad.net/ubuntu/focal/+package/python-is-python3
+        python-is-python3 \
         # https://classic.gazebosim.org/tutorials?tut=ros_installing
         ros-$ROS_DISTRO-gazebo-ros-pkgs ros-$ROS_DISTRO-gazebo-ros-control \
         ros-$ROS_DISTRO-turtlebot3 \
     && sudo rm -rf /var/lib/apt/lists/*
 
 # Latest pip supports pyproject.toml
-RUN python -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade pip
 
 # Workaround: https://answers.gazebosim.org/question/8577/gazebo-22-cant-open-usrsharegazebosetupsh/?answer=21515#post-id-21515
 # Fix not merged: https://github.com/ros-simulation/gazebo_ros_pkgs/pull/1100/commits/7d0ed4ceeea0c77a606ca59c539aa8d5d7e56dc8
@@ -41,4 +43,4 @@ RUN mkdir --parents ~/catkin_ws/src
 
 FROM base AS devel
 
-RUN python -m pip install mypy
+RUN python3 -m pip install mypy
