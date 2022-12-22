@@ -1,1 +1,1 @@
-make devel
+make all
