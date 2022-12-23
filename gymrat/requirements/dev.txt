@@ -1,0 +1,11 @@
+# Linting
+mypy
+ruff
+
+# Formatting
+black
+isort
+
+# Profiling
+py-spy
+scalene

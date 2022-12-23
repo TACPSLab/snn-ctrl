@@ -1,0 +1,4 @@
+- [Install just dependencies from pyproject.toml](https://github.com/pypa/pip/issues/11584)
+- [Requirements files](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
+- [Compatible release operator](https://peps.python.org/pep-0440/#compatible-release)
+- [An interactive tool](https://www.darius.page/pipdev) to test defined specifiers for version handling
