@@ -3,7 +3,7 @@ devel:
 
 all: devel
 	python3 -m pip install ./deeprl
-	make -C ./gymrat all-rqmts
+	make -C ./gym_exps all-rqmts
 
 clean:
 	rm -rf ../build
