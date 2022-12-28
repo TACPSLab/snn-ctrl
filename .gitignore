@@ -10,6 +10,5 @@ __pycache__/
 # Hydra default output/multirun directory 
 outputs/
 multirun/
-
-# Logs
-*.log
+# TODO: Generate .gitignore * in the Hydra working directory
+/experiments
