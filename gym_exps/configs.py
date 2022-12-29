@@ -33,13 +33,13 @@ TD3Conf = builds(
     action_dim=MISSING,
     policy="${policy}",
     critic=pbuilds(Critic, hidden_dims=[400, 300], activation_func='relu'),
-    policy_optimiser=pbuilds(optim.Adam, lr=1e-4),
-    critic_optimiser=pbuilds(optim.Adam, lr=1e-3),
-    experience_replay=builds(UER, capacity=10_000),
+    policy_optimiser=pbuilds(optim.Adam, lr=3e-4),
+    critic_optimiser=pbuilds(optim.Adam, lr=3e-4),
+    experience_replay=builds(UER, capacity=1_000_000),
     batch_size=2**10,
     discount_factor=0.99,
     polyak=0.99,
-    policy_noise=builds(Gaussian, stddev=0.2),
+    policy_noise=builds(Gaussian, stddev=0.1),
     smoothing_noise_stddev=0.2,
     smoothing_noise_clip=0.5,
 )
@@ -60,6 +60,6 @@ ExperimentConf = make_config(
     env=MISSING,
     algo=MISSING,
     policy=MISSING,
-    episodes=10_000,
+    num_episodes=100_000,
     device=builds(torch.device, device="cuda:1")
 )

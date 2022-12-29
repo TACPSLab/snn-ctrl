@@ -23,7 +23,7 @@ def experiment(cfg) -> None:
     )
 
     with SummaryWriter(log_dir=Path(hydra_cfg.runtime.output_dir)) as writer:
-        for episode in range(cfg.episodes):
+        for episode in range(cfg.num_episodes):
             state, _ = env.reset()
             state = torch.tensor(state, device=device, dtype=torch.float32)
             cumulative_reward = torch.zeros(1, device=device)
