@@ -1,5 +1,4 @@
 import gymnasium
-import torch
 import torch.optim as optim
 from hydra.core.config_store import ConfigStore
 from hydra_zen import MISSING, builds, make_config, make_custom_builds_fn
@@ -16,14 +15,20 @@ cs = ConfigStore.instance()
 Ant = builds(gymnasium.make, id="Ant-v4")
 cs.store(group="env", name="Ant", node=Ant)
 
-Hopper = builds(gymnasium.make, id="Hopper-v4")
-cs.store(group="env", name="Hopper", node=Hopper)
-
 HalfCheetah = builds(gymnasium.make, id="HalfCheetah-v4")
 cs.store(group="env", name="HalfCheetah", node=HalfCheetah)
 
+Hopper = builds(gymnasium.make, id="Hopper-v4")
+cs.store(group="env", name="Hopper", node=Hopper)
+
+Humanoid = builds(gymnasium.make, id="Humanoid-v4")
+cs.store(group="env", name="Humanoid", node=Humanoid)
+
 InvertedDoublePendulum = builds(gymnasium.make, id="InvertedDoublePendulum-v4")
 cs.store(group="env", name="InvertedDoublePendulum", node=InvertedDoublePendulum)
+
+Walker2d = builds(gymnasium.make, id="Walker2d-v4")
+cs.store(group="env", name="Walker2d", node=Walker2d)
 
 
 TD3Conf = builds(
@@ -53,13 +58,12 @@ cs.store(group="policy", name="ANN", node=ANN)
 ExperimentConf = make_config(
     defaults=[
         "_self_",
-        {"override /hydra/job_logging": "colorlog"},
+        {"override /hydra/launcher": "ray"},
         {"override /hydra/hydra_logging": "colorlog"},
-        {"override /hydra/launcher": "joblib"},
+        {"override /hydra/job_logging": "colorlog"},
     ],
     env=MISSING,
     algo=MISSING,
     policy=MISSING,
     num_episodes=100_000,
-    device=builds(torch.device, device="cuda:1")
 )
