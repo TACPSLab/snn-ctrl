@@ -6,3 +6,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  # Maintain requirements files for gym_exps
+  - package-ecosystem: "pip"
+    directory: "/gym_exps/requirements"
+    schedule:
+      interval: "weekly"
