@@ -31,7 +31,7 @@ def experiment(cfg) -> None:
         for episode in range(cfg.num_episodes):
             state, _ = env.reset()
             state = torch.tensor(state, device=cuda, dtype=torch.float32)
-            cumulative_reward = torch.zeros(1, device=cuda)
+            episodic_return = torch.zeros(1, device=cuda)
 
             while True:
                 action = agent.compute_action(state)
@@ -39,7 +39,7 @@ def experiment(cfg) -> None:
                 # Perform an action
                 next_state, reward, terminated, truncated, _ = env.step(action.cpu().numpy())
 
-                cumulative_reward += reward
+                episodic_return += reward
                 # Convert to size(1,) tensor
                 next_state = torch.tensor(next_state  , device=cuda, dtype=torch.float32)
                 reward     = torch.tensor([reward]    , device=cuda, dtype=torch.float32)
@@ -52,4 +52,4 @@ def experiment(cfg) -> None:
                 state = next_state
 
             # Logging
-            writer.add_scalar(f'{env.spec.name}/cumulative_reward', cumulative_reward.item(), episode)
+            writer.add_scalar(f'{env.spec.name}/episodic_return', episodic_return.item(), episode)
