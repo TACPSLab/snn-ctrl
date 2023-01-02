@@ -6,9 +6,6 @@ Notice that there is a plan to add JAX-based env to Gymnasium in 2023. See
 - https://github.com/Farama-Foundation/Gymnasium/issues/12
 
 FIXME
-Ray IDLE workers holding GPU memory.
-
-FIXME
 Torch can infer the dtype for tensors constructed using Python floats. See
 https://pytorch.org/docs/stable/generated/torch.set_default_dtype.html
 However, most envs return reward of numpy.float32/64 instead of float, and
