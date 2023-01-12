@@ -1,7 +1,7 @@
 # ../deeprl  # FIXME: Refering to specific local distribution paths prevents dependabot from treating this file as a requirements file
 gymnasium[classic-control,mujoco]==0.27.*
 hydra-core==1.3.*
-hydra-zen==0.8.*
+hydra-zen==0.9.*
 hydra-ray-launcher==1.2.*
 hydra-colorlog==1.2.*
 wandb
