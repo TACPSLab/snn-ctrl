@@ -22,9 +22,6 @@ Notice that the wrapper returns float(reward) instead of regular numpy
 object, which is confusing.
 
 TODO
-Why NormalizeObservation reduces traning performace?
-
-TODO
 Automate hyperparameter search by Optuna.
 - https://docs.cleanrl.dev/advanced/hyperparameter-tuning
 - https://docs.ray.io/en/latest/tune/index.html
@@ -51,9 +48,13 @@ import logging
 import math
 import os
 
+import numpy as np
 import ray
 import torch
 import wandb
+from gymnasium.wrappers.normalize import NormalizeObservation, NormalizeReward
+from gymnasium.wrappers.transform_observation import TransformObservation
+from gymnasium.wrappers.transform_reward import TransformReward
 from hydra.core.hydra_config import HydraConfig
 from hydra_zen import instantiate
 from omegaconf import DictConfig, OmegaConf
@@ -79,7 +80,11 @@ def experiment_process(cfg: DictConfig) -> None:
     cuda = torch.device("cuda")
 
     env = instantiate(cfg.env)
+    env = NormalizeObservation(env)
+    env = TransformObservation(env, lambda obs: np.clip(obs, -1, 1))
     env = SinglePrecisionObservation(env)
+    env = NormalizeReward(env)
+    env = TransformReward(env, lambda reward: np.clip(reward, -1, 1))
 
     agent = instantiate(
         cfg.algo,
