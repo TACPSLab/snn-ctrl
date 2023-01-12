@@ -32,31 +32,51 @@ Automate hyperparameter search by Optuna.
 TODO
 Periodical checkpointing the policy to Weights & Biases.
 - https://docs.cleanrl.dev/advanced/resume-training
+
+TODO
+https://github.com/wandb/wandb/commit/93e4974a05ce9b1d2fdcaf270290afde1f44e102
+Why using RUN?
+
+TODO
+Interpolate Hydra's output directory management into WanB or vice versa.
+https://github.com/facebookresearch/hydra/issues/1773
+https://github.com/facebookresearch/hydra/issues/910
+Wandb hardcodes its run_dir, which causes the use of loggers to store multiple directories
+https://github.com/wandb/wandb/issues/1620
+It's typically a bad idea to put files within the wandb folder as it is used to upload logs and files internally.
+wandb folder is mainly used for offline use (and later sync), for uploading files/media/objects and for debugging.
 """
 
 import logging
+import math
 import os
-from pathlib import Path
 
 import ray
 import torch
+import wandb
 from hydra.core.hydra_config import HydraConfig
 from hydra_zen import instantiate
-from torch.utils.tensorboard import SummaryWriter
+from omegaconf import DictConfig, OmegaConf
 
 from wrappers import SinglePrecisionObservation
 
 
 log = logging.getLogger(__name__)
 
-def experiment(cfg) -> None:
+def experiment_process(cfg: DictConfig) -> None:
+    hydra_cfg = HydraConfig.get()
+
+    wandb.init(
+        project="MuJoCo",
+        group=cfg.wandb.group,
+        config=OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True),
+        dir=hydra_cfg.runtime.output_dir,
+    )
+
     if len(ray.get_gpu_ids()) != 1:
         log.critical(f"One and only one GPU should be allocated to this job. Got {ray.get_gpu_ids()}.")
         return
-
-    cuda = torch.device("cuda")  # Default CUDA device
-    hydra_cfg = HydraConfig.get()
-    log.info(f"PID {os.getpid()} on GPU {ray.get_gpu_ids()[0]} experimenting combination {hydra_cfg.job.override_dirname}")
+    cuda = torch.device("cuda")
 
     env = instantiate(cfg.env)
     env = SinglePrecisionObservation(env)
@@ -64,33 +84,36 @@ def experiment(cfg) -> None:
     agent = instantiate(
         cfg.algo,
         device=cuda,
-        state_dim=env.observation_space.shape[0],
-        action_dim=env.action_space.shape[0],
+        state_dim=math.prod(env.observation_space.shape),
+        action_dim=math.prod(env.action_space.shape),
     )
 
-    with SummaryWriter(log_dir=Path(hydra_cfg.runtime.output_dir)) as writer:
-        for episode in range(cfg.num_episodes):
-            state, _ = env.reset()
-            state = torch.tensor(state, device=cuda)
-            episodic_return = torch.zeros(1, device=cuda)
+    log.info(f"PID {os.getpid()} on GPU {ray.get_gpu_ids()[0]} experimenting combination {hydra_cfg.job.override_dirname}")
 
-            while True:
-                action = agent.compute_action(state)
+    for episode in range(cfg.num_episodes):
+        state, _ = env.reset(seed=cfg.seed)
+        state = torch.tensor(state, device=cuda)
+        episodic_return = torch.zeros(1, device=cuda)
 
-                # Perform an action
-                next_state, reward, terminated, truncated, _ = env.step(action.cpu().numpy())
+        while True:
+            action = agent.compute_action(state)
 
-                next_state = torch.tensor(next_state, device=cuda)
-                # Convert to size(1,) tensor
-                reward = torch.tensor([reward], device=cuda, dtype=torch.float32)
-                terminated = torch.tensor([terminated], device=cuda, dtype=torch.bool)
+            # Perform an action
+            next_state, reward, terminated, truncated, _ = env.step(action.cpu().numpy())
 
-                agent.step(state, action, reward, next_state, terminated)
-                episodic_return += reward
+            next_state = torch.tensor(next_state, device=cuda)
+            # Convert to size(1,) tensor
+            reward = torch.tensor([reward], device=cuda, dtype=torch.float32)
+            terminated = torch.tensor([terminated], device=cuda, dtype=torch.bool)
 
-                if terminated or truncated:
-                    break
-                state = next_state
+            agent.step(state, action, reward, next_state, terminated)
+            episodic_return += reward
 
-            # Logging
-            writer.add_scalar(f'{env.spec.name}/episodic_return', episodic_return.item(), episode)
+            if terminated or truncated:
+                break
+            state = next_state
+
+        # Logging
+        wandb.log({
+            "episodic_return": episodic_return,
+        })
