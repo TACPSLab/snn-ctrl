@@ -75,7 +75,7 @@ def experiment_process(cfg: DictConfig) -> None:
     )
 
     if len(ray.get_gpu_ids()) != 1:
-        log.critical(f"One and only one GPU should be allocated to this job. Got {ray.get_gpu_ids()}.")
+        log.error(f"One and only one GPU should be allocated to this job. Got {ray.get_gpu_ids()}")
         return
     cuda = torch.device("cuda")
 
@@ -93,7 +93,7 @@ def experiment_process(cfg: DictConfig) -> None:
         action_dim=math.prod(env.action_space.shape),
     )
 
-    log.info(f"PID {os.getpid()} on GPU {ray.get_gpu_ids()[0]} experimenting combination {hydra_cfg.job.override_dirname}")
+    log.info(f"PID {os.getpid()} on GPU {cuda.index} experimenting combination {hydra_cfg.job.override_dirname}")
 
     for episode in range(cfg.num_episodes):
         state, _ = env.reset(seed=cfg.seed)
