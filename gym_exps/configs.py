@@ -5,6 +5,7 @@ from hydra.core.config_store import ConfigStore
 from hydra.conf import HydraConf, SweepDir
 from hydra_zen import MISSING, builds, make_config, make_custom_builds_fn
 
+from callbacks import LogJobReturnCallback
 from deeprl.actor_critic_methods import SAC, TD3
 from deeprl.actor_critic_methods.experience_replay import UER
 from deeprl.actor_critic_methods.neural_network import mlp
@@ -72,6 +73,7 @@ ExperimentConf = make_config(
         {"override /hydra/job_logging": "colorlog"},
     ],
     hydra=HydraConf(
+        callbacks={"log_job_return": builds(LogJobReturnCallback)},
         sweep=SweepDir(
             dir="${hydra.job.name}s/${wandb.group}",
             subdir="${hydra.job.override_dirname}"),
