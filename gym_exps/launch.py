@@ -18,9 +18,10 @@ jobs = launch(
         "+hydra.launcher.ray.remote.max_calls=1",  # forces GPU tasks to release resources after finishing
         # Experiment sweeps
         "+seed=0",
-        "+env=Ant,HalfCheetah,Hopper,Humanoid,Walker2d",
+        "+env=Ant-v4,HalfCheetah-v4,Hopper-v4,Humanoid-v4,Walker2d-v4",
         "+algo=SAC-ANN,TD3-ANN",
     ],
     multirun=True,
     version_base=None,  # FIXME: The version_base parameter is not specified. Please specify a compatability version level, or None. Will assume defaults for version 1.1
+    to_dictconfig=True,
 )

@@ -70,7 +70,6 @@ def experiment_process(cfg: DictConfig) -> None:
     wandb.init(
         project="MuJoCo",
         group=cfg.wandb.group,
-        config=OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True),
         dir=hydra_cfg.runtime.output_dir,
     )
 
@@ -80,22 +79,23 @@ def experiment_process(cfg: DictConfig) -> None:
     cuda = torch.device("cuda")
 
     env = instantiate(cfg.env)
-    env = NormalizeObservation(env)
-    env = TransformObservation(env, lambda obs: np.clip(obs, -1, 1))
+    # env = NormalizeObservation(env)
+    # env = TransformObservation(env, lambda obs: np.clip(obs, -1, 1))
     env = SinglePrecisionObservation(env)
-    env = NormalizeReward(env)
-    env = TransformReward(env, lambda reward: np.clip(reward, -1, 1))
+    # env = NormalizeReward(env)
+    # env = TransformReward(env, lambda reward: np.clip(reward, -1, 1))
 
+    cfg.algo.policy.state_dim=math.prod(env.observation_space.shape)
+    cfg.algo.policy.action_dim=math.prod(env.action_space.shape)
     agent = instantiate(
         cfg.algo,
         device=cuda,
-        state_dim=math.prod(env.observation_space.shape),
-        action_dim=math.prod(env.action_space.shape),
     )
 
-    log.info(f"PID {os.getpid()} on GPU {cuda.index} experimenting combination {hydra_cfg.job.override_dirname}")
+    wandb.config.update(OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True))
+    log.info(f"PID {os.getpid()} experimenting combination {hydra_cfg.job.override_dirname}")
 
-    for episode in range(cfg.num_episodes):
+    for episode in range(1_000_000):
         state, _ = env.reset(seed=cfg.seed)
         state = torch.tensor(state, device=cuda)
         episodic_return = torch.zeros(1, device=cuda)

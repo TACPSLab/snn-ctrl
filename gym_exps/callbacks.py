@@ -1,8 +1,9 @@
 import logging
 from typing import Any
-from omegaconf import DictConfig
+
 from hydra.core.utils import JobReturn, JobStatus
 from hydra.experimental.callback import Callback
+from omegaconf import DictConfig
 
 
 class LogJobReturnCallback(Callback):

@@ -1,8 +1,8 @@
 from typing import Union
 
 import numpy as np
-from gymnasium import ObservationWrapper, Env
-from gymnasium.spaces import Space, Box, Dict
+from gymnasium import Env, ObservationWrapper
+from gymnasium.spaces import Box, Dict, Space
 
 
 def _convert_observation_space(obs: Space) -> Space:
