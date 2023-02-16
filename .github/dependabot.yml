@@ -5,7 +5,7 @@ updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
 
   # Maintain requirements files for gym_exps
   - package-ecosystem: "pip"
