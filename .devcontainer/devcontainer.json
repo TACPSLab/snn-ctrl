@@ -4,7 +4,7 @@
     "build": {
         "dockerfile": "./Dockerfile",
         "context": "..",
-        "target": "devel"
+        "target": "base"
     },
 
     "runArgs": [
@@ -33,10 +33,6 @@
                 "tamasfe.even-better-toml"
             ],
             "settings": {
-                "python.linting.mypyEnabled": true,
-                "python.linting.mypyPath": "mypy",
-                "python.linting.mypyCategorySeverity.error": "Warning",
-                "python.linting.mypyCategorySeverity.note": "Information",
                 // https://github.com/microsoft/vscode-remote-release/issues/1671
                 "terminal.integrated.profiles.linux": {
                     "bash": {
