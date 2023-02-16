@@ -8,15 +8,12 @@
     },
 
     "runArgs": [
-        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",  // Comment this if not on Linux, or if on Linux but using wayland for display
         "--gpus", "all",
         "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined",  // enables using a ptrace-based debugger like C++, Go, and Rust
         "-v", "/dev/shm:/dev/shm"  // Ray uses shared memory for its object store and requires this memory to be more than 30% of available RAM so that it does not fallback to /tmp and degrade performance
     ],
 
     "containerEnv": {
-        // "DISPLAY": "host.docker.internal:0"
-        "DISPLAY": "${env:DISPLAY}",
         "GIT_EDITOR": "code --wait",
         "NVIDIA_VISIBLE_DEVICES": "all",
         "NVIDIA_DRIVER_CAPABILITIES": "all"
