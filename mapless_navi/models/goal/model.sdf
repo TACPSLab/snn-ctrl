@@ -1,13 +1,21 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='goal'>
-    <static>True</static>
-    <link name='goal'>
-      <visual name='goal'>
-        <pose frame=''>0 0 0.002 0 -0 0</pose>
+    <pose>0 0 0.001 0 0 0</pose>
+    <static>False</static>
+    <link name='link'>
+      <collision name="collision">
         <geometry>
           <cylinder>
-            <radius>0.4</radius>
+            <radius>0.001</radius>
+            <length>0.001</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.2</radius>
             <length>0.001</length>
           </cylinder>
         </geometry>
