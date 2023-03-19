@@ -1,3 +1,5 @@
 <launch>
    <include file="$(find mapless_navi)/launch/gazebo.launch" />
+   <include file="$(find mapless_navi)/launch/spawn_turtlebot3.launch" />
+   <include file="$(find mapless_navi)/launch/spawn_goal.launch" />
 </launch>

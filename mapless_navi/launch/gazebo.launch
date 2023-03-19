@@ -1,8 +1,4 @@
 <launch>
-    <arg name="x_pos" default="-1.0"/>
-    <arg name="y_pos" default="0.0"/>
-    <arg name="z_pos" default="0.0"/>
-
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <env name="GAZEBO_RESOURCE_PATH" value="$(find mapless_navi)"/>
         <!-- The world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
@@ -13,11 +9,4 @@
         <arg name="headless" value="false"/>
         <arg name="debug" value="false"/>
     </include>
-
-    <!-- Parsing xacro and setting robot_description parameter -->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_waffle_pi.urdf.xacro" />
-
-    <!-- Spawn URDF-based robots into Gazebo -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-        args="-urdf -model turtlebot3_waffle_pi -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
 </launch>

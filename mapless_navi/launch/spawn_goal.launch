@@ -1,0 +1,9 @@
+<launch>
+    <arg name="x_pos" default="1.0"/>
+    <arg name="y_pos" default="0.0"/>
+    <arg name="z_pos" default="0.0"/>
+
+    <!-- Spawn SDF-based goal model into Gazebo -->
+    <node name="spawn_goal" pkg="gazebo_ros" type="spawn_model"
+        args="-sdf -model goal -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -database goal" />
+</launch>
