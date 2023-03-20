@@ -39,12 +39,15 @@ class Env:
     """
 
     _device: torch.device
+
     _uuid: Any = get_or_generate_uuid(None, False)
     _reset_simulation: ServiceProxy = ServiceProxy("/gazebo/reset_simulation", Empty)
     _get_model_state: ServiceProxy = ServiceProxy("/gazebo/get_model_state", GetModelState)
     _set_model_state: ServiceProxy = ServiceProxy("/gazebo/set_model_state", SetModelState)
     _cmd_vel: Publisher = Publisher("/cmd_vel", Twist, queue_size=1)
     _launch: ROSLaunchParent = field(init=False)
+
+    _previous_distance: float = 0.0
 
     def __attrs_post_init__(self) -> None:
         configure_logging(self._uuid)  # Scripts using roslaunch MUST call configure_logging
@@ -66,7 +69,7 @@ class Env:
         )
 
         # FIXME: https://github.com/ros-simulation/gazebo_ros_pkgs/issues/1268
-        sleep(0.1)
+        sleep(0.05)
 
         obs = self._get_obs()
         reward = torch.zeros(1, device=self._device, dtype=torch.float32)
@@ -74,25 +77,24 @@ class Env:
         truncated = torch.tensor([False], device=self._device, dtype=torch.bool)
 
         scan = obs[:36]
-        # <x, y, z> vector that starts at the robot frame origin, terminates at the goal frame origin
-        separation = obs[36:]
+        separation = obs[36:]  # <x, y, z> starts at the robot frame origin, terminates at the goal frame origin
+        distance = separation.norm(p="fro")
+        relative_bearing = torch.arccos(separation[0] / distance)  # Angle between the vector and x-axis
 
         # Collide
         if scan.min() < 0.2:
             print("Collide")
             terminated = torch.tensor([True], device=self._device, dtype=torch.bool)
-            reward -= 500
+            reward -= 50
 
-        distance = separation.norm(p="fro")
         if distance < 0.3:
             print("Goal!")
             terminated = torch.tensor([True], device=self._device, dtype=torch.bool)
-            reward += 1_000
+            reward += 100
             # TODO: Reward if stop at the goal. Punish if rush past it.
 
-        # Angle between the vector and x-axis
-        relative_bearing = torch.arccos(separation[0] / distance)
-        reward += 10 * (2*pi - relative_bearing)  # TODO: Expose the factor
+        reward += 50 * (self._previous_distance - distance)  # TODO: Expose the factor
+        self._previous_distance = distance
 
         # TODO: Truncate if standstill
 
