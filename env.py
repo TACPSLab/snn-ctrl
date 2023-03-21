@@ -47,7 +47,7 @@ class Env:
     _set_model_state: ServiceProxy = ServiceProxy("/gazebo/set_model_state", SetModelState)
     _cmd_vel: Publisher = Publisher("/cmd_vel", Twist, queue_size=1)
 
-    _previous_distance: float = 0.0
+    _last_distance: float = 0.0
 
     def __attrs_post_init__(self) -> None:
         configure_logging(self._uuid)  # Scripts using roslaunch MUST call configure_logging
@@ -94,8 +94,8 @@ class Env:
             reward += 100
             # TODO: Reward if stop at the goal. Punish if rush past it.
 
-        reward += 50 * (self._previous_distance - distance)  # TODO: Expose the factor
-        self._previous_distance = distance
+        reward += 50 * (self._last_distance - distance)  # TODO: Expose the factor
+        self._last_distance = distance
 
         # TODO: Truncate if standstill
 
