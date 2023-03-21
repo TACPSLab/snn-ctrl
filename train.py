@@ -1,4 +1,3 @@
-import atexit
 from functools import partial
 
 import torch
@@ -14,7 +13,6 @@ from env import Env
 
 cuda = torch.device("cuda:1")
 env = Env(device=cuda)
-atexit.register(env.close)
 obs_dim = 36 + 3
 action_dim = 6
 # TODO: Use Optuna for hyperparameter optimisation

@@ -1,8 +1,9 @@
+import atexit
 from math import pi
 from time import sleep
 
 import torch
-from attrs import define, field
+from attrs import define
 from rospy import ServiceProxy, Publisher, init_node, wait_for_service, wait_for_message
 from roslaunch import configure_logging
 from roslaunch.parent import ROSLaunchParent
@@ -45,17 +46,17 @@ class Env:
     _get_model_state: ServiceProxy = ServiceProxy("/gazebo/get_model_state", GetModelState)
     _set_model_state: ServiceProxy = ServiceProxy("/gazebo/set_model_state", SetModelState)
     _cmd_vel: Publisher = Publisher("/cmd_vel", Twist, queue_size=1)
-    _launch: ROSLaunchParent = field(init=False)
 
     _previous_distance: float = 0.0
 
     def __attrs_post_init__(self) -> None:
         configure_logging(self._uuid)  # Scripts using roslaunch MUST call configure_logging
-        self._launch = ROSLaunchParent(
+        launch = ROSLaunchParent(
             self._uuid,
             [RosPack().get_path("mapless_navi") + "/launch/main.launch"],
         )
-        self._launch.start()
+        launch.start()
+        atexit.register(launch.shutdown)
 
         init_node("env")
         wait_for_service("/gazebo/reset_simulation")
@@ -118,9 +119,6 @@ class Env:
         ))
 
         return self._get_obs(), {}
-
-    def close(self) -> None:
-        self._launch.shutdown()
 
     def _get_obs(self) -> Tensor:
         scan: LaserScan = wait_for_message("/scan", LaserScan)

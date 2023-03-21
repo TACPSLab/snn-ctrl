@@ -1,5 +1,3 @@
-import atexit
-
 import torch  # https://github.com/microsoft/onnxruntime/issues/11092#issuecomment-1386840174
 import onnxruntime as ort
 
@@ -13,7 +11,6 @@ providers = [
 ]
 policy = ort.InferenceSession("policy.onnx", providers=providers)
 env = Env(device=torch.device("cpu"))
-atexit.register(env.close)
 
 obs, _ = env.reset(seed=None)
 for step in range(1000):
