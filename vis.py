@@ -14,7 +14,7 @@ env = Env(device=torch.device("cpu"))
 
 obs, _ = env.reset(seed=None)
 for step in range(1000):
-    action = policy.run(None, {"onnx::MatMul_0": obs.numpy()})
+    action = policy.run(None, {"state": obs.numpy()})
     next_obs, reward, terminated, truncated, _ = env.step(action[0])
 
     if not terminated and not truncated:

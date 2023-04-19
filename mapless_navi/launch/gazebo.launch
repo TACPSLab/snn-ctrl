@@ -2,7 +2,9 @@
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <env name="GAZEBO_RESOURCE_PATH" value="$(find mapless_navi)"/>
         <!-- The world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
-        <arg name="world_name" value="worlds/empty_square_enclosure.sdf" />
+        <!-- <arg name="world_name" value="worlds/empty.sdf" /> -->
+        <arg name="world_name" value="worlds/cluttered.sdf" />
+        <!-- <arg name="world_name" value="worlds/escape.sdf" /> -->
         <arg name="paused" value="false"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="gui" value="true"/>

@@ -2,6 +2,9 @@ FROM osrf/ros:noetic-desktop-focal AS base
 
 SHELL ["/bin/bash", "-c"]
 
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/user-guide.html
+ENV NVIDIA_DRIVER_CAPABILITIES all
+
 # Create the user
 ARG USERNAME=tacps
 ARG USER_UID=1000

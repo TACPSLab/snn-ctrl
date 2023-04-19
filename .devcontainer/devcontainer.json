@@ -16,9 +16,7 @@
 
     "containerEnv": {
         "DISPLAY": "${localEnv:DISPLAY}",
-        "GIT_EDITOR": "code --wait",
-        "NVIDIA_VISIBLE_DEVICES": "all",
-        "NVIDIA_DRIVER_CAPABILITIES": "all"
+        "GIT_EDITOR": "code --wait"
     },
 
     "remoteUser": "tacps",

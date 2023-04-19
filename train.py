@@ -13,7 +13,7 @@ from env import Env
 
 cuda = torch.device("cuda:1")
 env = Env(device=cuda)
-obs_dim = 36 + 3
+obs_dim = 36 + 3 + 10
 action_dim = 6
 # TODO: Use Optuna for hyperparameter optimisation
 agent = SAC.init(
@@ -47,5 +47,11 @@ for step in range(1_000_000):
         obs, _ = env.reset(); episodic_return = 0
 
     # TODO: Save checkpoints into wandb local dir for syncing
-    if step % 50 == 0:
-        torch.onnx.export(agent._policy.eval(), obs, "policy.onnx"); agent._policy.train()
+    if step % 300 == 0:
+        torch.onnx.export(
+            agent._policy,
+            obs,
+            "policy.onnx",
+            input_names = ["state"],
+            output_names = ["action"],
+        )

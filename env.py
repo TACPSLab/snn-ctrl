@@ -1,5 +1,4 @@
 import atexit
-from math import pi
 from time import sleep
 
 import torch
@@ -12,7 +11,7 @@ from rospkg import RosPack
 from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState, SetModelState
 from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose, Point, Quaternion, Twist, Vector3
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import LaserScan, Imu
 from std_srvs.srv import Empty
 from typing import Any, Dict, Optional, Tuple
 from torch import Tensor
@@ -78,7 +77,7 @@ class Env:
         truncated = torch.tensor([False], device=self._device, dtype=torch.bool)
 
         scan = obs[:36]
-        separation = obs[36:]  # <x, y, z> starts at the robot frame origin, terminates at the goal frame origin
+        separation = obs[36:39]  # <x, y, z> starts at the robot frame origin, terminates at the goal frame origin
         distance = separation.norm(p="fro")
         relative_bearing = torch.arccos(separation[0] / distance)  # Angle between the vector and x-axis
 
@@ -86,7 +85,7 @@ class Env:
         if scan.min() < 0.2:
             print("Collide")
             terminated = torch.tensor([True], device=self._device, dtype=torch.bool)
-            reward -= 50
+            reward -= 100
 
         if distance < 0.3:
             print("Goal!")
@@ -94,7 +93,7 @@ class Env:
             reward += 100
             # TODO: Reward if stop at the goal. Punish if rush past it.
 
-        reward += 50 * (self._last_distance - distance)  # TODO: Expose the factor
+        reward += 30 * (self._last_distance - distance)  # TODO: Expose the factor
         self._last_distance = distance
 
         # TODO: Truncate if standstill
@@ -122,6 +121,7 @@ class Env:
 
     def _get_obs(self) -> Tensor:
         scan: LaserScan = wait_for_message("/scan", LaserScan)
+        imu: Imu = wait_for_message("/imu", Imu)
         separation: ModelState = self._get_model_state(
             model_name="goal",
             relative_entity_name="turtlebot3_waffle_pi",
@@ -132,6 +132,16 @@ class Env:
             separation.pose.position.x,
             separation.pose.position.y,
             separation.pose.position.z,
+            imu.linear_acceleration.x,
+            imu.linear_acceleration.y,
+            imu.linear_acceleration.z,
+            imu.angular_velocity.x,
+            imu.angular_velocity.y,
+            imu.angular_velocity.z,
+            imu.orientation.x,
+            imu.orientation.y,
+            imu.orientation.z,
+            imu.orientation.w,
         ), dtype=torch.float32, device=self._device)
 
         return torch.nan_to_num(obs, posinf=3.5)
